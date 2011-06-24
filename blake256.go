@@ -188,9 +188,9 @@ func (d *digest) Reset() {
 
 func (d *digest) Size() int { return Size }
 
-// _Update updates the internal state of digest with the given data of
+// update updates the internal state of digest with the given data of
 // datalen in bits (not bytes!).
-func (d *digest) _Update(data []byte, datalen int) {
+func (d *digest) update(data []byte, datalen int) {
 	left := d.buflen >> 3
 	fill := 64 - left
 
@@ -225,7 +225,7 @@ func (d *digest) _Update(data []byte, datalen int) {
 }
 
 func (d *digest) Write(p []byte) (nn int, err os.Error) {
-	d._Update(p, len(p)*8)
+	d.update(p, len(p)*8)
 	return len(p), nil
 }
 
@@ -244,26 +244,26 @@ func (d *digest) Sum() []byte {
 
 	if d.buflen == 440 { // one padding byte
 		d.t[0] -= 8
-		d._Update(oo, 8)
+		d.update(oo, 8)
 	} else {
 		if d.buflen < 440 { // enought space to fill the block
 			if d.buflen == 0 {
 				d.nullt = 1
 			}
 			d.t[0] -= 440 - ubuflen
-			d._Update(padding, 440-d.buflen)
+			d.update(padding, 440-d.buflen)
 		} else { // need 2 compressions
 			d.t[0] -= 512 - ubuflen
-			d._Update(padding, 512-d.buflen)
+			d.update(padding, 512-d.buflen)
 			d.t[0] -= 440
-			d._Update(padding[1:], 440)
+			d.update(padding[1:], 440)
 			d.nullt = 1
 		}
-		d._Update(zo, 8)
+		d.update(zo, 8)
 		d.t[0] -= 8
 	}
 	d.t[0] -= 64
-	d._Update(msglen, 64)
+	d.update(msglen, 64)
 
 	out := make([]byte, 32)
 	u32to8(out[0:], d.h[0])
