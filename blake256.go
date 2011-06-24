@@ -58,8 +58,7 @@ func rot(x, n uint32) uint32 {
 }
 
 func u8to32(p []byte) uint32 {
-	return uint32(p[0])<<24 | uint32(p[1])<<16 |
-		uint32(p[2])<<8 | uint32(p[3])
+	return uint32(p[0])<<24 | uint32(p[1])<<16 | uint32(p[2])<<8 | uint32(p[3])
 }
 
 func u32to8(p []byte, v uint32) {
@@ -69,12 +68,25 @@ func u32to8(p []byte, v uint32) {
 	p[3] = byte(v)
 }
 
-func (d *digest) _Block(block []uint8) {
+func (d *digest) _Block(p []uint8) {
 	var m [16]uint32
 
-	for i := 0; i < 16; i++ {
-		m[i] = u8to32(block[i*4:])
-	}
+	m[0] = u8to32(block[0:])
+	m[1] = u8to32(block[4:])
+	m[2] = u8to32(block[8:])
+	m[3] = u8to32(block[12:])
+	m[4] = u8to32(block[16:])
+	m[5] = u8to32(block[20:])
+	m[6] = u8to32(block[24:])
+	m[7] = u8to32(block[28:])
+	m[8] = u8to32(block[32:])
+	m[9] = u8to32(block[36:])
+	m[10] = u8to32(block[40:])
+	m[11] = u8to32(block[44:])
+	m[12] = u8to32(block[48:])
+	m[13] = u8to32(block[52:])
+	m[14] = u8to32(block[56:])
+	m[15] = u8to32(block[60:])
 
 	v0 := d.h[0]
 	v1 := d.h[1]
