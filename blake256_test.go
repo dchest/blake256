@@ -2,6 +2,7 @@ package blake256
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"testing"
 )
 
@@ -64,22 +65,26 @@ func BenchmarkShort(b *testing.B) {
 	}
 }
 
-func xortest(a, b []byte) {
-	// no range -- we want to check indexing performance.
-	for i := 0; i < len(a); i++ {
-		a[i] ^= b[i]
+func BenchmarkSHA2L(b *testing.B) {
+	b.StopTimer()
+	h := sha256.New()
+	data := make([]byte, 64)
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		h.Write(data)
+		b.SetBytes(64)
 	}
 }
 
-// BenchmarkPlainXOR benchmarks Go's XOR.
-// This is useful to compare performance.
-func BenchmarkPlainXOR(b *testing.B) {
+func BenchmarkSHA2S(b *testing.B) {
 	b.StopTimer()
-	a1 := make([]byte, 64)
-	a2 := make([]byte, 64)
+	h := sha256.New()
+	data := make([]byte, 64)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		xortest(a1, a2)
+		h.Write(data)
+		h.Sum()
+		h.Reset()
 		b.SetBytes(64)
 	}
 }
