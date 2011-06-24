@@ -257,8 +257,6 @@ func (d *digest) Sum() []byte {
 	d.gotsum = true
 	ubuflen := uint32(d.buflen)
 	msglen := make([]byte, 8)
-	zo := []byte{0x01}
-	oo := []byte{0x81}
 	lo := d.t[0] + ubuflen
 	hi := d.t[1]
 	if lo < ubuflen {
@@ -269,7 +267,7 @@ func (d *digest) Sum() []byte {
 
 	if d.buflen == 440 { // one padding byte
 		d.t[0] -= 8
-		d.update(oo, 8)
+		d.update([]byte{0x81}, 8)
 	} else {
 		if d.buflen < 440 { // enought space to fill the block
 			if d.buflen == 0 {
@@ -284,7 +282,7 @@ func (d *digest) Sum() []byte {
 			d.update(padding[1:], 440)
 			d.nullt = true
 		}
-		d.update(zo, 8)
+		d.update([]byte{0x01}, 8)
 		d.t[0] -= 8
 	}
 	d.t[0] -= 64
