@@ -184,10 +184,14 @@ func (d *digest) _Block(block []uint8) {
 	d.h[5] ^= v13
 	d.h[6] ^= v14
 	d.h[7] ^= v15
-
-	for i := 0; i < 8; i++ {
-		d.h[i] ^= d.s[i%4]
-	}
+	d.h[0] ^= d.s[0]
+	d.h[1] ^= d.s[1]
+	d.h[2] ^= d.s[2]
+	d.h[3] ^= d.s[3]
+	d.h[4] ^= d.s[0]
+	d.h[5] ^= d.s[1]
+	d.h[6] ^= d.s[2]
+	d.h[7] ^= d.s[3]
 }
 
 func (d *digest) Reset() {
