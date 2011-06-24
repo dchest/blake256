@@ -20,7 +20,7 @@ type digest struct {
 	h      [8]uint32
 	salt   [4]uint32
 	t      [2]uint32
-	nullt  int
+	nullt  bool
 	buf    [BlockSize]uint8
 	buflen int  // buffer length in bits
 	gotsum bool // indicates whether Sum was called
@@ -90,7 +90,7 @@ func (d *digest) _Block(p []uint8) {
 	v13 := uint32(0x299F31D0)
 	v14 := uint32(0x082EFA98)
 	v15 := uint32(0xEC4E6C89)
-	if d.nullt == 0 {
+	if !d.nullt {
 		v12 ^= d.t[0]
 		v13 ^= d.t[0]
 		v14 ^= d.t[1]
@@ -186,7 +186,7 @@ func (d *digest) Reset() {
 	d.h[7] = 0x5BE0CD19
 	d.t[0] = 0
 	d.t[1] = 0
-	d.nullt = 0
+	d.nullt = false
 	d.salt[0] = 0
 	d.salt[1] = 0
 	d.salt[2] = 0
@@ -273,7 +273,7 @@ func (d *digest) Sum() []byte {
 	} else {
 		if d.buflen < 440 { // enought space to fill the block
 			if d.buflen == 0 {
-				d.nullt = 1
+				d.nullt = true
 			}
 			d.t[0] -= 440 - ubuflen
 			d.update(padding, uint64(440-d.buflen))
@@ -282,7 +282,7 @@ func (d *digest) Sum() []byte {
 			d.update(padding, uint64(512-d.buflen))
 			d.t[0] -= 440
 			d.update(padding[1:], 440)
-			d.nullt = 1
+			d.nullt = true
 		}
 		d.update(zo, 8)
 		d.t[0] -= 8
