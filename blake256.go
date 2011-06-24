@@ -23,8 +23,6 @@ type digest struct {
 	nullt  int
 	buf    [BlockSize]uint8
 	buflen int // buffer length in bits
-	nx     int
-	tc     uint64 // total count
 }
 
 var sigma = [][]uint8{
@@ -180,8 +178,6 @@ func (d *digest) Reset() {
 	d.h[7] = 0x5BE0CD19
 	d.t[0] = 0
 	d.t[1] = 0
-	d.tc = 0
-	d.nx = 0
 	d.nullt = 0
 	d.s[0] = 0
 	d.s[1] = 0
