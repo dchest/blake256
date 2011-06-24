@@ -71,22 +71,22 @@ func u32to8(p []byte, v uint32) {
 func (d *digest) _Block(p []uint8) {
 	var m [16]uint32
 
-	m[0] = u8to32(block[0:])
-	m[1] = u8to32(block[4:])
-	m[2] = u8to32(block[8:])
-	m[3] = u8to32(block[12:])
-	m[4] = u8to32(block[16:])
-	m[5] = u8to32(block[20:])
-	m[6] = u8to32(block[24:])
-	m[7] = u8to32(block[28:])
-	m[8] = u8to32(block[32:])
-	m[9] = u8to32(block[36:])
-	m[10] = u8to32(block[40:])
-	m[11] = u8to32(block[44:])
-	m[12] = u8to32(block[48:])
-	m[13] = u8to32(block[52:])
-	m[14] = u8to32(block[56:])
-	m[15] = u8to32(block[60:])
+	m[0] = uint32(p[0])<<24 | uint32(p[1])<<16 | uint32(p[2])<<8 | uint32(p[3])
+	m[1] = uint32(p[4])<<24 | uint32(p[5])<<16 | uint32(p[6])<<8 | uint32(p[7])
+	m[2] = uint32(p[8])<<24 | uint32(p[9])<<16 | uint32(p[10])<<8 | uint32(p[11])
+	m[3] = uint32(p[12])<<24 | uint32(p[13])<<16 | uint32(p[14])<<8 | uint32(p[15])
+	m[4] = uint32(p[16])<<24 | uint32(p[17])<<16 | uint32(p[18])<<8 | uint32(p[19])
+	m[5] = uint32(p[20])<<24 | uint32(p[21])<<16 | uint32(p[22])<<8 | uint32(p[23])
+	m[6] = uint32(p[24])<<24 | uint32(p[25])<<16 | uint32(p[26])<<8 | uint32(p[27])
+	m[7] = uint32(p[28])<<24 | uint32(p[29])<<16 | uint32(p[30])<<8 | uint32(p[31])
+	m[8] = uint32(p[32])<<24 | uint32(p[33])<<16 | uint32(p[34])<<8 | uint32(p[35])
+	m[9] = uint32(p[36])<<24 | uint32(p[37])<<16 | uint32(p[38])<<8 | uint32(p[39])
+	m[10] = uint32(p[40])<<24 | uint32(p[41])<<16 | uint32(p[42])<<8 | uint32(p[43])
+	m[11] = uint32(p[44])<<24 | uint32(p[45])<<16 | uint32(p[46])<<8 | uint32(p[47])
+	m[12] = uint32(p[48])<<24 | uint32(p[49])<<16 | uint32(p[50])<<8 | uint32(p[51])
+	m[13] = uint32(p[52])<<24 | uint32(p[53])<<16 | uint32(p[54])<<8 | uint32(p[55])
+	m[14] = uint32(p[56])<<24 | uint32(p[57])<<16 | uint32(p[58])<<8 | uint32(p[59])
+	m[15] = uint32(p[60])<<24 | uint32(p[61])<<16 | uint32(p[62])<<8 | uint32(p[63])
 
 	v0 := d.h[0]
 	v1 := d.h[1]
