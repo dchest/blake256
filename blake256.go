@@ -18,7 +18,7 @@ const BlockSize = 64
 
 type digest struct {
 	h      [8]uint32
-	s      [4]uint32
+	salt   [4]uint32
 	t      [2]uint32
 	nullt  int
 	buf    [BlockSize]uint8
@@ -82,10 +82,10 @@ func (d *digest) _Block(p []uint8) {
 	v5 := d.h[5]
 	v6 := d.h[6]
 	v7 := d.h[7]
-	v8 := d.s[0] ^ 0x243F6A88
-	v9 := d.s[1] ^ 0x85A308D3
-	v10 := d.s[2] ^ 0x13198A2E
-	v11 := d.s[3] ^ 0x03707344
+	v8 := d.salt[0] ^ 0x243F6A88
+	v9 := d.salt[1] ^ 0x85A308D3
+	v10 := d.salt[2] ^ 0x13198A2E
+	v11 := d.salt[3] ^ 0x03707344
 	v12 := uint32(0xA4093822)
 	v13 := uint32(0x299F31D0)
 	v14 := uint32(0x082EFA98)
@@ -165,14 +165,14 @@ func (d *digest) _Block(p []uint8) {
 		v6 = (v6^v11)<<(32-7) | (v6^v11)>>7
 	}
 
-	d.h[0] ^= v0 ^ v8 ^ d.s[0]
-	d.h[1] ^= v1 ^ v9 ^ d.s[1]
-	d.h[2] ^= v2 ^ v10 ^ d.s[2]
-	d.h[3] ^= v3 ^ v11 ^ d.s[3]
-	d.h[4] ^= v4 ^ v12 ^ d.s[0]
-	d.h[5] ^= v5 ^ v13 ^ d.s[1]
-	d.h[6] ^= v6 ^ v14 ^ d.s[2]
-	d.h[7] ^= v7 ^ v15 ^ d.s[3]
+	d.h[0] ^= v0 ^ v8 ^ d.salt[0]
+	d.h[1] ^= v1 ^ v9 ^ d.salt[1]
+	d.h[2] ^= v2 ^ v10 ^ d.salt[2]
+	d.h[3] ^= v3 ^ v11 ^ d.salt[3]
+	d.h[4] ^= v4 ^ v12 ^ d.salt[0]
+	d.h[5] ^= v5 ^ v13 ^ d.salt[1]
+	d.h[6] ^= v6 ^ v14 ^ d.salt[2]
+	d.h[7] ^= v7 ^ v15 ^ d.salt[3]
 }
 
 func (d *digest) Reset() {
@@ -187,10 +187,10 @@ func (d *digest) Reset() {
 	d.t[0] = 0
 	d.t[1] = 0
 	d.nullt = 0
-	d.s[0] = 0
-	d.s[1] = 0
-	d.s[2] = 0
-	d.s[3] = 0
+	d.salt[0] = 0
+	d.salt[1] = 0
+	d.salt[2] = 0
+	d.salt[3] = 0
 	d.buflen = 0
 	d.gotsum = false
 }
