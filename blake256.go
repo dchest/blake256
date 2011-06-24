@@ -245,9 +245,6 @@ func u32to8(p []byte, v uint32) {
 }
 
 // Sum returns the calculated checksum.
-//
-// Hash becomes unusable after calling this method, and if not Reset,
-// subsequent Write will fail with panic.
 func (d0 *digest) Sum() []byte {
 	// Make a copy of d0 so that caller can keep writing and summing.
 	d := new(digest)
