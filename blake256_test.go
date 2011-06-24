@@ -31,14 +31,22 @@ func TestBlake256(t *testing.T) {
 		t.Errorf("0: expected %X, got %X", hashes[0], sum)
 	}
 
+	// Try to continue hashing.
+	h.Write(data[1:])
+	sum = h.Sum()
+	//fmt.Printf("%X\n", sum)
+	if !bytes.Equal(hashes[1], sum) {
+		t.Errorf("1(1): expected %X, got %X", hashes[1], sum)
+	}
+
+	// Try with reset.
 	h.Reset()
 	h.Write(data)
 	sum = h.Sum()
 	//fmt.Printf("%X\n", sum)
 	if !bytes.Equal(hashes[1], sum) {
-		t.Errorf("1: expected %X, got %X", hashes[1], sum)
+		t.Errorf("1(2): expected %X, got %X", hashes[1], sum)
 	}
-
 }
 
 func BenchmarkLong(b *testing.B) {

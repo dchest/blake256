@@ -23,7 +23,6 @@ type digest struct {
 	nullt  bool
 	buf    [BlockSize]uint8
 	buflen int  // buffer length in bits
-	gotsum bool // indicates whether Sum was called
 }
 
 var sigma = [...][...]uint8{
@@ -192,7 +191,6 @@ func (d *digest) Reset() {
 	d.salt[2] = 0
 	d.salt[3] = 0
 	d.buflen = 0
-	d.gotsum = false
 }
 
 func (d *digest) Size() int { return Size }
@@ -234,9 +232,6 @@ func (d *digest) update(data []byte, datalen uint64) {
 }
 
 func (d *digest) Write(p []byte) (nn int, err os.Error) {
-	if d.gotsum {
-		panic("calling Write after Sum without resetting hash")
-	}
 	nn = len(p)
 	d.update(p, uint64(nn)*8)
 	return
@@ -253,8 +248,11 @@ func u32to8(p []byte, v uint32) {
 //
 // Hash becomes unusable after calling this method, and if not Reset,
 // subsequent Write will fail with panic.
-func (d *digest) Sum() []byte {
-	d.gotsum = true
+func (d0 *digest) Sum() []byte {
+	// Make a copy of d0 so that caller can keep writing and summing.
+	d := new(digest)
+	*d = *d0
+
 	ubuflen := uint32(d.buflen)
 	msglen := make([]byte, 8)
 	lo := d.t[0] + ubuflen
