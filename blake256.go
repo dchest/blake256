@@ -22,7 +22,7 @@ type digest struct {
 	t      [2]uint32
 	nullt  int
 	buf    [BlockSize]uint8
-	buflen int // buffer length in bits
+	buflen int  // buffer length in bits
 	gotsum bool // indicates whether Sum was called
 }
 
