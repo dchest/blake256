@@ -23,6 +23,7 @@ type digest struct {
 	nullt  int
 	buf    [BlockSize]uint8
 	buflen int // buffer length in bits
+	gotsum bool // indicates whether Sum was called
 }
 
 var sigma = [][]uint8{
@@ -52,21 +53,6 @@ var padding = []uint8{
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0}
-
-func rot(x, n uint32) uint32 {
-	return x<<(32-n) | x>>n
-}
-
-func u8to32(p []byte) uint32 {
-	return uint32(p[0])<<24 | uint32(p[1])<<16 | uint32(p[2])<<8 | uint32(p[3])
-}
-
-func u32to8(p []byte, v uint32) {
-	p[0] = byte(v >> 24)
-	p[1] = byte(v >> 16)
-	p[2] = byte(v >> 8)
-	p[3] = byte(v)
-}
 
 func (d *digest) _Block(p []uint8) {
 	var m [16]uint32
@@ -206,6 +192,7 @@ func (d *digest) Reset() {
 	d.s[2] = 0
 	d.s[3] = 0
 	d.buflen = 0
+	d.gotsum = false
 }
 
 func (d *digest) Size() int { return Size }
@@ -247,11 +234,27 @@ func (d *digest) update(data []byte, datalen int) {
 }
 
 func (d *digest) Write(p []byte) (nn int, err os.Error) {
-	d.update(p, len(p)*8)
-	return len(p), nil
+	if d.gotsum {
+		panic("calling Write after Sum without resetting hash")
+	}
+	nn = len(p)
+	d.update(p, nn*8)
+	return
 }
 
+func u32to8(p []byte, v uint32) {
+	p[0] = byte(v >> 24)
+	p[1] = byte(v >> 16)
+	p[2] = byte(v >> 8)
+	p[3] = byte(v)
+}
+
+// Sum returns the calculated checksum.
+//
+// Hash becomes unusable after calling this method, and if not Reset,
+// subsequent Write will fail with panic.
 func (d *digest) Sum() []byte {
+	d.gotsum = true
 	ubuflen := uint32(d.buflen)
 	msglen := make([]byte, 8)
 	zo := []byte{0x01}
@@ -299,6 +302,7 @@ func (d *digest) Sum() []byte {
 	return out
 }
 
+// New returns a new hash.Hash computing the BLAKE-256 checksum.
 func New() hash.Hash {
 	d := new(digest)
 	d.Reset()
