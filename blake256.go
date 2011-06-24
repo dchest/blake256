@@ -199,11 +199,11 @@ func (d *digest) Size() int { return Size }
 
 // update updates the internal state of digest with the given data of
 // datalen in bits (not bytes!).
-func (d *digest) update(data []byte, datalen int) {
+func (d *digest) update(data []byte, datalen uint64) {
 	left := d.buflen >> 3
 	fill := 64 - left
 
-	if left != 0 && (datalen>>3)&0x3F >= fill {
+	if left != 0 && int(datalen>>3)&0x3F >= fill {
 		copy(d.buf[left:], data[:fill])
 		d.t[0] += 512
 		if d.t[0] == 0 {
@@ -211,7 +211,7 @@ func (d *digest) update(data []byte, datalen int) {
 		}
 		d._Block(d.buf[:])
 		data = data[fill:]
-		datalen -= fill << 3
+		datalen -= uint64(fill) << 3
 		left = 0
 	}
 
@@ -227,7 +227,7 @@ func (d *digest) update(data []byte, datalen int) {
 
 	if datalen > 0 {
 		copy(d.buf[left:], data)
-		d.buflen = left<<3 + datalen
+		d.buflen = left<<3 + int(datalen)
 	} else {
 		d.buflen = 0
 	}
@@ -238,7 +238,7 @@ func (d *digest) Write(p []byte) (nn int, err os.Error) {
 		panic("calling Write after Sum without resetting hash")
 	}
 	nn = len(p)
-	d.update(p, nn*8)
+	d.update(p, uint64(nn)*8)
 	return
 }
 
@@ -276,10 +276,10 @@ func (d *digest) Sum() []byte {
 				d.nullt = 1
 			}
 			d.t[0] -= 440 - ubuflen
-			d.update(padding, 440-d.buflen)
+			d.update(padding, uint64(440-d.buflen))
 		} else { // need 2 compressions
 			d.t[0] -= 512 - ubuflen
-			d.update(padding, 512-d.buflen)
+			d.update(padding, uint64(512-d.buflen))
 			d.t[0] -= 440
 			d.update(padding[1:], 440)
 			d.nullt = 1
