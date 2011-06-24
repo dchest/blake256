@@ -84,7 +84,6 @@ func (d *digest) _Block(block []uint8) {
 	v5 := d.h[5]
 	v6 := d.h[6]
 	v7 := d.h[7]
-
 	v8 := d.s[0] ^ 0x243F6A88
 	v9 := d.s[1] ^ 0x85A308D3
 	v10 := d.s[2] ^ 0x13198A2E
@@ -168,30 +167,14 @@ func (d *digest) _Block(block []uint8) {
 		v6 = (v6^v11)<<(32-7) | (v6^v11)>>7
 	}
 
-	d.h[0] ^= v0
-	d.h[1] ^= v1
-	d.h[2] ^= v2
-	d.h[3] ^= v3
-	d.h[4] ^= v4
-	d.h[5] ^= v5
-	d.h[6] ^= v6
-	d.h[7] ^= v7
-	d.h[0] ^= v8
-	d.h[1] ^= v9
-	d.h[2] ^= v10
-	d.h[3] ^= v11
-	d.h[4] ^= v12
-	d.h[5] ^= v13
-	d.h[6] ^= v14
-	d.h[7] ^= v15
-	d.h[0] ^= d.s[0]
-	d.h[1] ^= d.s[1]
-	d.h[2] ^= d.s[2]
-	d.h[3] ^= d.s[3]
-	d.h[4] ^= d.s[0]
-	d.h[5] ^= d.s[1]
-	d.h[6] ^= d.s[2]
-	d.h[7] ^= d.s[3]
+	d.h[0] ^= v0 ^ v8 ^ d.s[0]
+	d.h[1] ^= v1 ^ v9 ^ d.s[1]
+	d.h[2] ^= v2 ^ v10 ^ d.s[2]
+	d.h[3] ^= v3 ^ v11 ^ d.s[3]
+	d.h[4] ^= v4 ^ v12 ^ d.s[0]
+	d.h[5] ^= v5 ^ v13 ^ d.s[1]
+	d.h[6] ^= v6 ^ v14 ^ d.s[2]
+	d.h[7] ^= v7 ^ v15 ^ d.s[3]
 }
 
 func (d *digest) Reset() {
