@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestBlake256(t *testing.T) {
+func Test256C(t *testing.T) {
 	// Test as in C program.
 	var hashes = [][]byte{
 		{
@@ -50,30 +50,57 @@ func TestBlake256(t *testing.T) {
 	if !bytes.Equal(hashes[1], sum) {
 		t.Errorf("1(2): expected %X, got %X", hashes[1], sum)
 	}
+}
 
-	// Other test vectors.
-	vectors := []struct{ out, in string }{
-		{"7576698ee9cad30173080678e5965916adbb11cb5245d386bf1ffda1cb26c9d7",
+type blakeVector struct {
+	out, in string
+}
+
+var vectors256 = []blakeVector{
+	{"7576698ee9cad30173080678e5965916adbb11cb5245d386bf1ffda1cb26c9d7",
 		"The quick brown fox jumps over the lazy dog"},
-		{"07663e00cf96fbc136cf7b1ee099c95346ba3920893d18cc8851f22ee2e36aa6",
+	{"07663e00cf96fbc136cf7b1ee099c95346ba3920893d18cc8851f22ee2e36aa6",
 		"BLAKE"},
-		{"716f6e863f744b9ac22c97ec7b76ea5f5908bc5b2f67c61510bfc4751384ea7a",
+	{"716f6e863f744b9ac22c97ec7b76ea5f5908bc5b2f67c61510bfc4751384ea7a",
 		""},
-		{"18a393b4e62b1887a2edf79a5c5a5464daf5bbb976f4007bea16a73e4c1e198e",
+	{"18a393b4e62b1887a2edf79a5c5a5464daf5bbb976f4007bea16a73e4c1e198e",
 		"'BLAKE wins SHA-3! Hooray!!!' (I have time machine)"},
-		{"fd7282ecc105ef201bb94663fc413db1b7696414682090015f17e309b835f1c2",
+	{"fd7282ecc105ef201bb94663fc413db1b7696414682090015f17e309b835f1c2",
 		"Go"},
-		{"1e75db2a709081f853c2229b65fd1558540aa5e7bd17b04b9a4b31989effa711",
+	{"1e75db2a709081f853c2229b65fd1558540aa5e7bd17b04b9a4b31989effa711",
 		"HELP! I'm trapped in hash!"},
-	}
+}
+
+var vectors224 = []blakeVector{
+	{"c8e92d7088ef87c1530aee2ad44dc720cc10589cc2ec58f95a15e51b",
+		"The quick brown fox jumps over the lazy dog"},
+	{"cfb6848add73e1cb47994c4765df33b8f973702705a30a71fe4747a3",
+		"BLAKE"},
+	{"7dc5313b1c04512a174bd6503b89607aecbee0903d40a8a569c94eed",
+		""},
+	{"dde9e442003c24495db607b17e07ec1f67396cc1907642a09a96594e",
+		"Go"},
+	{"9f655b0a92d4155754fa35e055ce7c5e18eb56347081ea1e5158e751",
+		"Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo"},
+}
+
+func testVectors(t *testing.T, hashfunc func() hash.Hash, vectors []blakeVector) {
 	for i, v := range vectors {
-		h := New()
+		h := hashfunc()
 		h.Write([]byte(v.in))
 		res := fmt.Sprintf("%x", h.Sum())
 		if res != v.out {
-			t.Errorf("[v] %d: expected %q, got %q", i, v.out, res)
+			t.Errorf("%d: expected %q, got %q", i, v.out, res)
 		}
 	}
+}
+
+func Test256(t *testing.T) {
+	testVectors(t, New, vectors256)
+}
+
+func Test224(t *testing.T) {
+	testVectors(t, New224, vectors224)
 }
 
 var longData, shortData []byte

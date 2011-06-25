@@ -10,19 +10,17 @@ import (
 	"hash"
 )
 
-// The size of the checksum in bytes.
-const Size = 32
-
 // The block size of the hash algorithm in bytes.
 const BlockSize = 64
 
 type digest struct {
-	h      [8]uint32
-	salt   [4]uint32
-	t      [2]uint32
-	nullt  bool
-	buf    [BlockSize]uint8
-	buflen int // buffer length in bits
+	h        [8]uint32
+	salt     [4]uint32
+	t        [2]uint32
+	nullt    bool
+	buf      [BlockSize]uint8
+	buflen   int // buffer length in bits
+	hashSize int // hash output size in bits
 }
 
 var sigma = [16][16]uint8{
@@ -161,14 +159,25 @@ func (d *digest) _Block(p []uint8) {
 }
 
 func (d *digest) Reset() {
-	d.h[0] = 0x6A09E667
-	d.h[1] = 0xBB67AE85
-	d.h[2] = 0x3C6EF372
-	d.h[3] = 0xA54FF53A
-	d.h[4] = 0x510E527F
-	d.h[5] = 0x9B05688C
-	d.h[6] = 0x1F83D9AB
-	d.h[7] = 0x5BE0CD19
+	if d.hashSize == 224 {
+		d.h[0] = 0xC1059ED8
+		d.h[1] = 0x367CD507
+		d.h[2] = 0x3070DD17
+		d.h[3] = 0xF70E5939
+		d.h[4] = 0xFFC00B31
+		d.h[5] = 0x68581511
+		d.h[6] = 0x64F98FA7
+		d.h[7] = 0xBEFA4FA4
+	} else {
+		d.h[0] = 0x6A09E667
+		d.h[1] = 0xBB67AE85
+		d.h[2] = 0x3C6EF372
+		d.h[3] = 0xA54FF53A
+		d.h[4] = 0x510E527F
+		d.h[5] = 0x9B05688C
+		d.h[6] = 0x1F83D9AB
+		d.h[7] = 0x5BE0CD19
+	}
 	d.t[0] = 0
 	d.t[1] = 0
 	d.nullt = false
@@ -179,7 +188,7 @@ func (d *digest) Reset() {
 	d.buflen = 0
 }
 
-func (d *digest) Size() int { return Size }
+func (d *digest) Size() int { return d.hashSize >> 3 }
 
 // update updates the internal state of digest with the given data of
 // datalen in bits (not bytes!).
@@ -248,7 +257,11 @@ func (d0 *digest) Sum() []byte {
 
 	if d.buflen == 440 { // one padding byte
 		d.t[0] -= 8
-		d.update([]byte{0x81}, 8)
+		if d.hashSize == 224 {
+			d.update([]byte{0x80}, 8)
+		} else {
+			d.update([]byte{0x81}, 8)
+		}
 	} else {
 		if d.buflen < 440 { // enought space to fill the block
 			if d.buflen == 0 {
@@ -263,15 +276,19 @@ func (d0 *digest) Sum() []byte {
 			d.update(padding[1:], 440)
 			d.nullt = true
 		}
-		d.update([]byte{0x01}, 8)
+		if d.hashSize == 224 {
+			d.update([]byte{0x00}, 8)
+		} else {
+			d.update([]byte{0x01}, 8)
+		}
 		d.t[0] -= 8
 	}
 	d.t[0] -= 64
 	d.update(msglen, 64)
 
-	out := make([]byte, 32)
+	out := make([]byte, d.Size())
 	j := 0
-	for _, s := range d.h {
+	for _, s := range d.h[:d.hashSize>>5] {
 		out[j+0] = byte(s >> 24)
 		out[j+1] = byte(s >> 16)
 		out[j+2] = byte(s >> 8)
@@ -281,9 +298,19 @@ func (d0 *digest) Sum() []byte {
 	return out
 }
 
+func newHash(bitSize int) (d *digest) {
+	d = new(digest)
+	d.hashSize = bitSize
+	d.Reset()
+	return
+}
+
 // New returns a new hash.Hash computing the BLAKE-256 checksum.
 func New() hash.Hash {
-	d := new(digest)
-	d.Reset()
-	return d
+	return newHash(256)
+}
+
+// New224 returns a new hash.Hash computing the BLAKE-224 checksum.
+func New224() hash.Hash {
+	return newHash(224)
 }
