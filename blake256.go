@@ -254,19 +254,19 @@ func (d0 *digest) Sum() []byte {
 			d.update([]byte{0x81}, 8)
 		}
 	} else {
-		var padding [64]byte
-		padding[0] = 0x80
+		var pad [64]byte
+		pad[0] = 0x80
 		if d.buflen < 440 { // enought space to fill the block
 			if d.buflen == 0 {
 				d.nullt = true
 			}
 			d.t[0] -= 440 - ubuflen
-			d.update(padding[:], uint64(440-d.buflen))
+			d.update(pad[:], uint64(440-d.buflen))
 		} else { // need 2 compressions
 			d.t[0] -= 512 - ubuflen
-			d.update(padding[:], uint64(512-d.buflen))
+			d.update(pad[:], uint64(512-d.buflen))
 			d.t[0] -= 440
-			d.update(padding[1:], 440)
+			d.update(pad[1:], 440)
 			d.nullt = true
 		}
 		if d.hashSize == 224 {
