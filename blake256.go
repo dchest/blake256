@@ -77,14 +77,14 @@ func (d *digest) _Block(p []uint8) {
 	v5 := d.h[5]
 	v6 := d.h[6]
 	v7 := d.h[7]
-	v8 := d.salt[0] ^ 0x243F6A88
-	v9 := d.salt[1] ^ 0x85A308D3
-	v10 := d.salt[2] ^ 0x13198A2E
-	v11 := d.salt[3] ^ 0x03707344
-	v12 := uint32(0xA4093822)
-	v13 := uint32(0x299F31D0)
-	v14 := uint32(0x082EFA98)
-	v15 := uint32(0xEC4E6C89)
+	v8 := d.salt[0] ^ cst[0]
+	v9 := d.salt[1] ^ cst[1]
+	v10 := d.salt[2] ^ cst[2]
+	v11 := d.salt[3] ^ cst[3]
+	v12 := cst[4]
+	v13 := cst[5]
+	v14 := cst[6]
+	v15 := cst[7]
 	if !d.nullt {
 		v12 ^= d.t[0]
 		v13 ^= d.t[0]
