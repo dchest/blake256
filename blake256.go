@@ -204,7 +204,7 @@ func (d *digest) update(data []byte, datalen uint64) {
 		if d.t[0] == 0 {
 			d.t[1]++
 		}
-		d._Block(data)
+		d._Block(data[:64])
 		data = data[64:]
 		datalen -= 512
 	}
@@ -243,8 +243,8 @@ func (d0 *digest) Sum() []byte {
 		hi++
 	}
 	msglen := make([]byte, 8)
-	u32to8(msglen, hi)
-	u32to8(msglen[4:], lo)
+	u32to8(msglen[0:4], hi)
+	u32to8(msglen[4:8], lo)
 
 	if d.buflen == 440 { // one padding byte
 		d.t[0] -= 8
