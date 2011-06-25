@@ -3,11 +3,13 @@ package blake256
 import (
 	"bytes"
 	"crypto/sha256"
+	"fmt"
 	"hash"
 	"testing"
 )
 
 func TestBlake256(t *testing.T) {
+	// Test as in C program.
 	var hashes = [][]byte{
 		{
 			0x0C, 0xE8, 0xD4, 0xEF, 0x4D, 0xD7, 0xCD, 0x8D,
@@ -47,6 +49,30 @@ func TestBlake256(t *testing.T) {
 	//fmt.Printf("%X\n", sum)
 	if !bytes.Equal(hashes[1], sum) {
 		t.Errorf("1(2): expected %X, got %X", hashes[1], sum)
+	}
+
+	// Other test vectors.
+	vectors := []struct{ out, in string }{
+		{"7576698ee9cad30173080678e5965916adbb11cb5245d386bf1ffda1cb26c9d7",
+		"The quick brown fox jumps over the lazy dog"},
+		{"07663e00cf96fbc136cf7b1ee099c95346ba3920893d18cc8851f22ee2e36aa6",
+		"BLAKE"},
+		{"716f6e863f744b9ac22c97ec7b76ea5f5908bc5b2f67c61510bfc4751384ea7a",
+		""},
+		{"18a393b4e62b1887a2edf79a5c5a5464daf5bbb976f4007bea16a73e4c1e198e",
+		"'BLAKE wins SHA-3! Hooray!!!' (I have time machine)"},
+		{"fd7282ecc105ef201bb94663fc413db1b7696414682090015f17e309b835f1c2",
+		"Go"},
+		{"1e75db2a709081f853c2229b65fd1558540aa5e7bd17b04b9a4b31989effa711",
+		"HELP! I'm trapped in hash!"},
+	}
+	for i, v := range vectors {
+		h := New()
+		h.Write([]byte(v.in))
+		res := fmt.Sprintf("%x", h.Sum())
+		if res != v.out {
+			t.Errorf("[v] %d: expected %q, got %q", i, v.out, res)
+		}
 	}
 }
 
