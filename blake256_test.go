@@ -103,6 +103,34 @@ func Test224(t *testing.T) {
 	testVectors(t, New224, vectors224)
 }
 
+var vectors256salt = []struct{ out, in, salt string }{
+	{"561d6d0cfa3d31d5eedaf2d575f3942539b03522befc2a1196ba0e51af8992a8",
+		"",
+		"1234567890123456"},
+	{"88cc11889bbbee42095337fe2153c591971f94fbf8fe540d3c7e9f1700ab2d0c",
+		"It's so salty out there!",
+		"SALTsaltSaltSALT"},
+}
+
+func TestSalt(t *testing.T) {
+	for i, v := range vectors256salt {
+		h := NewSalt([]byte(v.salt))
+		h.Write([]byte(v.in))
+		res := fmt.Sprintf("%x", h.Sum())
+		if res != v.out {
+			t.Errorf("%d: expected %q, got %q", i, v.out, res)
+		}
+	}
+
+	// Check that passing bad salt length panics.
+	defer func() {
+		if err := recover(); err == nil {
+			t.Errorf("expected panic for bad salt length")
+		}
+	}()
+	NewSalt([]byte{1,2,3,4,5,6,7,8})
+}
+
 var longData, shortData []byte
 
 func init() {

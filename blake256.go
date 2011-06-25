@@ -15,16 +15,17 @@ import (
 const BlockSize = 64
 
 type digest struct {
-	h        [8]uint32
-	salt     [4]uint32
-	t        [2]uint32
-	nullt    bool
-	buf      [BlockSize]uint8
-	buflen   int // buffer length in bits
-	hashSize int // hash output size in bits
+	hashSize int              // hash output size in bits (224 or 256)
+	h        [8]uint32        // current chain value
+	salt     [4]uint32        // salt (zero by default)
+	t        [2]uint32        // counter of hashed bits
+	nullt    bool             // special case for finalization
+	buf      [BlockSize]uint8 // cache for data not yet compressed
+	buflen   int              // cache length in bits
 }
 
 var (
+	// Permutations of {0, ..., 15}.
 	sigma = [16][16]uint8{
 		{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 		{14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3},
@@ -41,12 +42,14 @@ var (
 		{11, 8, 12, 0, 5, 2, 15, 13, 10, 14, 3, 6, 7, 1, 9, 4},
 		{7, 9, 3, 1, 13, 12, 11, 14, 2, 6, 5, 10, 4, 0, 15, 8}}
 
+	// Constants.
 	cst = [16]uint32{
 		0x243F6A88, 0x85A308D3, 0x13198A2E, 0x03707344,
 		0xA4093822, 0x299F31D0, 0x082EFA98, 0xEC4E6C89,
 		0x452821E6, 0x38D01377, 0xBE5466CF, 0x34E90C6C,
 		0xC0AC29B7, 0xC97C50DD, 0x3F84D5B5, 0xB5470917}
 
+	// Initialization values.
 	iv256 = [8]uint32{
 		0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
 		0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19}
@@ -163,6 +166,7 @@ func (d *digest) _Block(p []uint8) {
 	d.h[7] ^= v7 ^ v15 ^ d.salt[3]
 }
 
+// Reset resets the state of digest. It leaves salt intact.
 func (d *digest) Reset() {
 	if d.hashSize == 224 {
 		d.h = iv224
@@ -172,17 +176,13 @@ func (d *digest) Reset() {
 	d.t[0] = 0
 	d.t[1] = 0
 	d.nullt = false
-	d.salt[0] = 0
-	d.salt[1] = 0
-	d.salt[2] = 0
-	d.salt[3] = 0
 	d.buflen = 0
 }
 
 func (d *digest) Size() int { return d.hashSize >> 3 }
 
-// update updates the internal state of digest with the given data of
-// datalen in bits (not bytes!).
+// update updates the internal state of digest with the given data,
+// of the given length in bits (!).
 func (d *digest) update(data []byte, datalen uint64) {
 	left := d.buflen >> 3
 	fill := 64 - left
@@ -291,7 +291,17 @@ func (d0 *digest) Sum() []byte {
 	return out
 }
 
-func newHash(bitSize int) (d *digest) {
+func (d *digest) setSalt(s []byte) {
+	if len(s) != 16 {
+		panic("salt length must be 16 bytes")
+	}
+	d.salt[0] = uint32(s[0])<<24 | uint32(s[1])<<16 | uint32(s[2])<<8 | uint32(s[3])
+	d.salt[1] = uint32(s[4])<<24 | uint32(s[5])<<16 | uint32(s[6])<<8 | uint32(s[7])
+	d.salt[2] = uint32(s[8])<<24 | uint32(s[9])<<16 | uint32(s[10])<<8 | uint32(s[11])
+	d.salt[3] = uint32(s[12])<<24 | uint32(s[13])<<16 | uint32(s[14])<<8 | uint32(s[15])
+}
+
+func newDigest(bitSize int) (d *digest) {
 	d = new(digest)
 	d.hashSize = bitSize
 	d.Reset()
@@ -300,10 +310,24 @@ func newHash(bitSize int) (d *digest) {
 
 // New returns a new hash.Hash computing the BLAKE-256 checksum.
 func New() hash.Hash {
-	return newHash(256)
+	return newDigest(256)
 }
 
 // New224 returns a new hash.Hash computing the BLAKE-224 checksum.
 func New224() hash.Hash {
-	return newHash(224)
+	return newDigest(224)
+}
+
+// NewSalt is like New but initializes salt with the given 16-byte slice.
+func NewSalt(salt []byte) hash.Hash {
+	d := newDigest(256)
+	d.setSalt(salt)
+	return d
+}
+
+// New224Salt is like New224 but initializes salt with the given 16-byte slice.
+func New224Salt(salt []byte) hash.Hash {
+	d := newDigest(224)
+	d.setSalt(salt)
+	return d
 }
