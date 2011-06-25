@@ -1,10 +1,10 @@
+// Written by Dmitry Chestnykh. Put into the public domain.
+
 // Package blake256 implements BLAKE-256 and BLAKE-224 hash functions (SHA-3
 // candidate).
 //
 // Derived from blake256_light.c: light portable C implementation of BLAKE-256
 // (http://www.131002.net/blake/#sw)
-//
-// Written by Dmitry Chestnykh. Put into the public domain.
 package blake256
 
 import (
