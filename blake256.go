@@ -54,25 +54,24 @@ var padding = []uint8{
 	0, 0, 0, 0, 0, 0, 0, 0}
 
 func (d *digest) _Block(p []uint8) {
-	var m [16]uint32
-
-	m[0] = uint32(p[0])<<24 | uint32(p[1])<<16 | uint32(p[2])<<8 | uint32(p[3])
-	m[1] = uint32(p[4])<<24 | uint32(p[5])<<16 | uint32(p[6])<<8 | uint32(p[7])
-	m[2] = uint32(p[8])<<24 | uint32(p[9])<<16 | uint32(p[10])<<8 | uint32(p[11])
-	m[3] = uint32(p[12])<<24 | uint32(p[13])<<16 | uint32(p[14])<<8 | uint32(p[15])
-	m[4] = uint32(p[16])<<24 | uint32(p[17])<<16 | uint32(p[18])<<8 | uint32(p[19])
-	m[5] = uint32(p[20])<<24 | uint32(p[21])<<16 | uint32(p[22])<<8 | uint32(p[23])
-	m[6] = uint32(p[24])<<24 | uint32(p[25])<<16 | uint32(p[26])<<8 | uint32(p[27])
-	m[7] = uint32(p[28])<<24 | uint32(p[29])<<16 | uint32(p[30])<<8 | uint32(p[31])
-	m[8] = uint32(p[32])<<24 | uint32(p[33])<<16 | uint32(p[34])<<8 | uint32(p[35])
-	m[9] = uint32(p[36])<<24 | uint32(p[37])<<16 | uint32(p[38])<<8 | uint32(p[39])
-	m[10] = uint32(p[40])<<24 | uint32(p[41])<<16 | uint32(p[42])<<8 | uint32(p[43])
-	m[11] = uint32(p[44])<<24 | uint32(p[45])<<16 | uint32(p[46])<<8 | uint32(p[47])
-	m[12] = uint32(p[48])<<24 | uint32(p[49])<<16 | uint32(p[50])<<8 | uint32(p[51])
-	m[13] = uint32(p[52])<<24 | uint32(p[53])<<16 | uint32(p[54])<<8 | uint32(p[55])
-	m[14] = uint32(p[56])<<24 | uint32(p[57])<<16 | uint32(p[58])<<8 | uint32(p[59])
-	m[15] = uint32(p[60])<<24 | uint32(p[61])<<16 | uint32(p[62])<<8 | uint32(p[63])
-
+	m := [16]uint32{
+		uint32(p[0])<<24 | uint32(p[1])<<16 | uint32(p[2])<<8 | uint32(p[3]),
+		uint32(p[4])<<24 | uint32(p[5])<<16 | uint32(p[6])<<8 | uint32(p[7]),
+		uint32(p[8])<<24 | uint32(p[9])<<16 | uint32(p[10])<<8 | uint32(p[11]),
+		uint32(p[12])<<24 | uint32(p[13])<<16 | uint32(p[14])<<8 | uint32(p[15]),
+		uint32(p[16])<<24 | uint32(p[17])<<16 | uint32(p[18])<<8 | uint32(p[19]),
+		uint32(p[20])<<24 | uint32(p[21])<<16 | uint32(p[22])<<8 | uint32(p[23]),
+		uint32(p[24])<<24 | uint32(p[25])<<16 | uint32(p[26])<<8 | uint32(p[27]),
+		uint32(p[28])<<24 | uint32(p[29])<<16 | uint32(p[30])<<8 | uint32(p[31]),
+		uint32(p[32])<<24 | uint32(p[33])<<16 | uint32(p[34])<<8 | uint32(p[35]),
+		uint32(p[36])<<24 | uint32(p[37])<<16 | uint32(p[38])<<8 | uint32(p[39]),
+		uint32(p[40])<<24 | uint32(p[41])<<16 | uint32(p[42])<<8 | uint32(p[43]),
+		uint32(p[44])<<24 | uint32(p[45])<<16 | uint32(p[46])<<8 | uint32(p[47]),
+		uint32(p[48])<<24 | uint32(p[49])<<16 | uint32(p[50])<<8 | uint32(p[51]),
+		uint32(p[52])<<24 | uint32(p[53])<<16 | uint32(p[54])<<8 | uint32(p[55]),
+		uint32(p[56])<<24 | uint32(p[57])<<16 | uint32(p[58])<<8 | uint32(p[59]),
+		uint32(p[60])<<24 | uint32(p[61])<<16 | uint32(p[62])<<8 | uint32(p[63]),
+	}
 	v0 := d.h[0]
 	v1 := d.h[1]
 	v2 := d.h[2]
@@ -251,12 +250,12 @@ func (d0 *digest) Sum() []byte {
 	*d = *d0
 
 	ubuflen := uint32(d.buflen)
-	msglen := make([]byte, 8)
 	lo := d.t[0] + ubuflen
 	hi := d.t[1]
 	if lo < ubuflen {
 		hi++
 	}
+	msglen := make([]byte, 8)
 	u32to8(msglen, hi)
 	u32to8(msglen[4:], lo)
 
@@ -284,14 +283,14 @@ func (d0 *digest) Sum() []byte {
 	d.update(msglen, 64)
 
 	out := make([]byte, 32)
-	u32to8(out[0:], d.h[0])
-	u32to8(out[4:], d.h[1])
-	u32to8(out[8:], d.h[2])
-	u32to8(out[12:], d.h[3])
-	u32to8(out[16:], d.h[4])
-	u32to8(out[20:], d.h[5])
-	u32to8(out[24:], d.h[6])
-	u32to8(out[28:], d.h[7])
+	j := 0
+	for _, s := range d.h {
+		out[j+0] = byte(s >> 24)
+		out[j+1] = byte(s >> 16)
+		out[j+2] = byte(s >> 8)
+		out[j+3] = byte(s >> 0)
+		j += 4
+	}
 	return out
 }
 
