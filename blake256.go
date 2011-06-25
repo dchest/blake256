@@ -3,8 +3,7 @@
 // Package blake256 implements BLAKE-256 and BLAKE-224 hash functions (SHA-3
 // candidate).
 //
-// Derived from blake256_light.c: light portable C implementation of BLAKE-256
-// (http://www.131002.net/blake/#sw)
+// Derived from reference implementation in C.
 package blake256
 
 import (
