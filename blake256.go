@@ -22,10 +22,10 @@ type digest struct {
 	t      [2]uint32
 	nullt  bool
 	buf    [BlockSize]uint8
-	buflen int  // buffer length in bits
+	buflen int // buffer length in bits
 }
 
-var sigma = [...][...]uint8{
+var sigma = [16][16]uint8{
 	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
 	{14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3},
 	{11, 8, 12, 0, 5, 2, 15, 13, 10, 14, 3, 6, 7, 1, 9, 4},
@@ -54,24 +54,14 @@ var padding = []uint8{
 	0, 0, 0, 0, 0, 0, 0, 0}
 
 func (d *digest) _Block(p []uint8) {
-	m := [16]uint32{
-		uint32(p[0])<<24 | uint32(p[1])<<16 | uint32(p[2])<<8 | uint32(p[3]),
-		uint32(p[4])<<24 | uint32(p[5])<<16 | uint32(p[6])<<8 | uint32(p[7]),
-		uint32(p[8])<<24 | uint32(p[9])<<16 | uint32(p[10])<<8 | uint32(p[11]),
-		uint32(p[12])<<24 | uint32(p[13])<<16 | uint32(p[14])<<8 | uint32(p[15]),
-		uint32(p[16])<<24 | uint32(p[17])<<16 | uint32(p[18])<<8 | uint32(p[19]),
-		uint32(p[20])<<24 | uint32(p[21])<<16 | uint32(p[22])<<8 | uint32(p[23]),
-		uint32(p[24])<<24 | uint32(p[25])<<16 | uint32(p[26])<<8 | uint32(p[27]),
-		uint32(p[28])<<24 | uint32(p[29])<<16 | uint32(p[30])<<8 | uint32(p[31]),
-		uint32(p[32])<<24 | uint32(p[33])<<16 | uint32(p[34])<<8 | uint32(p[35]),
-		uint32(p[36])<<24 | uint32(p[37])<<16 | uint32(p[38])<<8 | uint32(p[39]),
-		uint32(p[40])<<24 | uint32(p[41])<<16 | uint32(p[42])<<8 | uint32(p[43]),
-		uint32(p[44])<<24 | uint32(p[45])<<16 | uint32(p[46])<<8 | uint32(p[47]),
-		uint32(p[48])<<24 | uint32(p[49])<<16 | uint32(p[50])<<8 | uint32(p[51]),
-		uint32(p[52])<<24 | uint32(p[53])<<16 | uint32(p[54])<<8 | uint32(p[55]),
-		uint32(p[56])<<24 | uint32(p[57])<<16 | uint32(p[58])<<8 | uint32(p[59]),
-		uint32(p[60])<<24 | uint32(p[61])<<16 | uint32(p[62])<<8 | uint32(p[63]),
+	var m [16]uint32
+	j := 0
+	for i := 0; i < 16; i++ {
+		m[i] = uint32(p[j])<<24 | uint32(p[j+1])<<16 |
+			uint32(p[j+2])<<8 | uint32(p[j+3])
+		j += 4
 	}
+
 	v0 := d.h[0]
 	v1 := d.h[1]
 	v2 := d.h[2]
