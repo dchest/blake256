@@ -9,6 +9,8 @@ candidate).
 Derived from blake256_light.c: light portable C implementation of BLAKE-256
 (http://www.131002.net/blake/#sw)
 
+Public domain.
+
 
 Constants
 ---------
