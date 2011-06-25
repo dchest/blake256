@@ -34,3 +34,15 @@ New returns a new hash.Hash computing the BLAKE-256 checksum.
 	func New224() hash.Hash
 
 New224 returns a new hash.Hash computing the BLAKE-224 checksum.
+
+### func New224Salt
+
+	func New224Salt(salt []byte) hash.Hash
+
+New224Salt is like New224 but initializes salt with the given 16-byte slice.
+
+### func NewSalt
+
+	func NewSalt(salt []byte) hash.Hash
+
+NewSalt is like New but initializes salt with the given 16-byte slice.
