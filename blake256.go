@@ -83,7 +83,7 @@ func (d *digest) _Block(p []uint8) {
 	}
 
 	for i := 0; i < 14; i++ {
-		si := sigma[i]
+		si := &sigma[i]
 		v0 += (m[si[0]] ^ cst[si[0+1]]) + v4
 		v12 = (v12^v0)<<(32-16) | (v12^v0)>>16
 		v8 += v12
