@@ -3,6 +3,7 @@ package blake256
 import (
 	"bytes"
 	"crypto/sha256"
+	"hash"
 	"testing"
 )
 
@@ -49,52 +50,37 @@ func TestBlake256(t *testing.T) {
 	}
 }
 
-const bsize = 73
+var longData, shortData []byte
 
-func BenchmarkLong(b *testing.B) {
+func init() {
+	longData = make([]byte, 4096)
+	shortData = make([]byte, 64)
+}
+
+func testHash(b *testing.B, hashfunc func() hash.Hash, data []byte) {
 	b.StopTimer()
-	h := New()
-	data := make([]byte, bsize)
+	h := hashfunc()
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		h.Write(data)
-		b.SetBytes(bsize)
+		h.Sum()
+		h.Reset()
+		b.SetBytes(int64(len(data)))
 	}
+}
+
+func BenchmarkLong(b *testing.B) {
+	testHash(b, New, longData)
 }
 
 func BenchmarkShort(b *testing.B) {
-	b.StopTimer()
-	h := New()
-	data := make([]byte, bsize)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		h.Write(data)
-		h.Sum()
-		h.Reset()
-		b.SetBytes(bsize)
-	}
+	testHash(b, New, shortData)
 }
 
 func BenchmarkSHA2L(b *testing.B) {
-	b.StopTimer()
-	h := sha256.New()
-	data := make([]byte, bsize)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		h.Write(data)
-		b.SetBytes(bsize)
-	}
+	testHash(b, sha256.New, longData)
 }
 
 func BenchmarkSHA2S(b *testing.B) {
-	b.StopTimer()
-	h := sha256.New()
-	data := make([]byte, bsize)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		h.Write(data)
-		h.Sum()
-		h.Reset()
-		b.SetBytes(bsize)
-	}
+	testHash(b, sha256.New, shortData)
 }
