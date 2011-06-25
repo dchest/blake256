@@ -49,50 +49,52 @@ func TestBlake256(t *testing.T) {
 	}
 }
 
+const bsize = 73
+
 func BenchmarkLong(b *testing.B) {
 	b.StopTimer()
 	h := New()
-	data := make([]byte, 64)
+	data := make([]byte, bsize)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		h.Write(data)
-		b.SetBytes(64)
+		b.SetBytes(bsize)
 	}
 }
 
 func BenchmarkShort(b *testing.B) {
 	b.StopTimer()
 	h := New()
-	data := make([]byte, 64)
+	data := make([]byte, bsize)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		h.Write(data)
 		h.Sum()
 		h.Reset()
-		b.SetBytes(64)
+		b.SetBytes(bsize)
 	}
 }
 
 func BenchmarkSHA2L(b *testing.B) {
 	b.StopTimer()
 	h := sha256.New()
-	data := make([]byte, 64)
+	data := make([]byte, bsize)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		h.Write(data)
-		b.SetBytes(64)
+		b.SetBytes(bsize)
 	}
 }
 
 func BenchmarkSHA2S(b *testing.B) {
 	b.StopTimer()
 	h := sha256.New()
-	data := make([]byte, 64)
+	data := make([]byte, bsize)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		h.Write(data)
 		h.Sum()
 		h.Reset()
-		b.SetBytes(64)
+		b.SetBytes(bsize)
 	}
 }

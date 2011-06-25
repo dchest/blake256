@@ -55,13 +55,10 @@ var padding = []uint8{
 
 func (d *digest) _Block(p []uint8) {
 	var m [16]uint32
-	j := 0
 	for i := 0; i < 16; i++ {
-		m[i] = uint32(p[j])<<24 | uint32(p[j+1])<<16 |
-			uint32(p[j+2])<<8 | uint32(p[j+3])
-		j += 4
+		j := i * 4
+		m[i] = uint32(p[j])<<24 | uint32(p[j+1])<<16 | uint32(p[j+2])<<8 | uint32(p[j+3])
 	}
-
 	v0 := d.h[0]
 	v1 := d.h[1]
 	v2 := d.h[2]
