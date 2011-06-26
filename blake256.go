@@ -254,9 +254,8 @@ func (d0 *digest) Sum() []byte {
 			d.update([]byte{0x81}, 8)
 		}
 	} else {
-		var pad [64]byte
-		pad[0] = 0x80
-		if d.buflen < 440 { // enought space to fill the block
+		pad := [64]byte{0x80}
+		if d.buflen < 440 { // enough space to fill the block
 			if d.buflen == 0 {
 				d.nullt = true
 			}
