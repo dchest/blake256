@@ -6,10 +6,7 @@
 // Derived from reference implementation in C.
 package blake256
 
-import (
-	"os"
-	"hash"
-)
+import "hash"
 
 // The block size of the hash algorithm in bytes.
 const BlockSize = 64
@@ -217,7 +214,7 @@ func (d *digest) update(data []byte, datalen uint64) {
 	}
 }
 
-func (d *digest) Write(p []byte) (nn int, err os.Error) {
+func (d *digest) Write(p []byte) (nn int, err error) {
 	nn = len(p)
 	d.update(p, uint64(nn)*8)
 	return
@@ -231,10 +228,9 @@ func u32to8(p []byte, v uint32) {
 }
 
 // Sum returns the calculated checksum.
-func (d0 *digest) Sum() []byte {
+func (d0 *digest) Sum(in []byte) []byte {
 	// Make a copy of d0 so that caller can keep writing and summing.
-	d := new(digest)
-	*d = *d0
+	d := *d0
 
 	ubuflen := uint32(d.buflen)
 	lo := d.t[0] + ubuflen
@@ -287,7 +283,7 @@ func (d0 *digest) Sum() []byte {
 		out[j+3] = byte(s >> 0)
 		j += 4
 	}
-	return out
+	return append(in, out...)
 }
 
 func (d *digest) setSalt(s []byte) {

@@ -28,7 +28,7 @@ func Test256C(t *testing.T) {
 
 	h := New()
 	h.Write(data[:1])
-	sum := h.Sum()
+	sum := h.Sum(nil)
 	//fmt.Printf("%X\n", sum)
 	if !bytes.Equal(hashes[0], sum) {
 		t.Errorf("0: expected %X, got %X", hashes[0], sum)
@@ -36,7 +36,7 @@ func Test256C(t *testing.T) {
 
 	// Try to continue hashing.
 	h.Write(data[1:])
-	sum = h.Sum()
+	sum = h.Sum(nil)
 	//fmt.Printf("%X\n", sum)
 	if !bytes.Equal(hashes[1], sum) {
 		t.Errorf("1(1): expected %X, got %X", hashes[1], sum)
@@ -45,7 +45,7 @@ func Test256C(t *testing.T) {
 	// Try with reset.
 	h.Reset()
 	h.Write(data)
-	sum = h.Sum()
+	sum = h.Sum(nil)
 	//fmt.Printf("%X\n", sum)
 	if !bytes.Equal(hashes[1], sum) {
 		t.Errorf("1(2): expected %X, got %X", hashes[1], sum)
@@ -88,7 +88,7 @@ func testVectors(t *testing.T, hashfunc func() hash.Hash, vectors []blakeVector)
 	for i, v := range vectors {
 		h := hashfunc()
 		h.Write([]byte(v.in))
-		res := fmt.Sprintf("%x", h.Sum())
+		res := fmt.Sprintf("%x", h.Sum(nil))
 		if res != v.out {
 			t.Errorf("%d: expected %q, got %q", i, v.out, res)
 		}
@@ -116,7 +116,7 @@ func TestSalt(t *testing.T) {
 	for i, v := range vectors256salt {
 		h := NewSalt([]byte(v.salt))
 		h.Write([]byte(v.in))
-		res := fmt.Sprintf("%x", h.Sum())
+		res := fmt.Sprintf("%x", h.Sum(nil))
 		if res != v.out {
 			t.Errorf("%d: expected %q, got %q", i, v.out, res)
 		}
@@ -128,7 +128,7 @@ func TestSalt(t *testing.T) {
 			t.Errorf("expected panic for bad salt length")
 		}
 	}()
-	NewSalt([]byte{1,2,3,4,5,6,7,8})
+	NewSalt([]byte{1, 2, 3, 4, 5, 6, 7, 8})
 }
 
 var longData, shortData []byte
@@ -144,7 +144,7 @@ func testHash(b *testing.B, hashfunc func() hash.Hash, data []byte) {
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		h.Write(data)
-		h.Sum()
+		h.Sum(nil)
 		h.Reset()
 		b.SetBytes(int64(len(data)))
 	}
