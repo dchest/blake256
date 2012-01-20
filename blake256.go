@@ -178,6 +178,8 @@ func (d *digest) Reset() {
 
 func (d *digest) Size() int { return d.hashSize >> 3 }
 
+func (d *digest) BlockSize() int { return BlockSize }
+
 // update updates the internal state of digest with the given data,
 // of the given length in bits (!).
 func (d *digest) update(data []byte, datalen uint64) {
