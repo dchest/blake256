@@ -131,9 +131,10 @@ func TestSalt(t *testing.T) {
 	NewSalt([]byte{1, 2, 3, 4, 5, 6, 7, 8})
 }
 
-var longData, shortData []byte
+var longerData, longData, shortData []byte
 
 func init() {
+	longerData = make([]byte, 88888)
 	longData = make([]byte, 4096)
 	shortData = make([]byte, 64)
 }
@@ -141,13 +142,18 @@ func init() {
 func testHash(b *testing.B, hashfunc func() hash.Hash, data []byte) {
 	b.StopTimer()
 	h := hashfunc()
+	digest := make([]byte, 0, BlockSize)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		h.Write(data)
-		h.Sum(nil)
+		h.Sum(digest)
 		h.Reset()
 		b.SetBytes(int64(len(data)))
 	}
+}
+
+func BenchmarkLonger(b *testing.B) {
+	testHash(b, New, longerData)
 }
 
 func BenchmarkLong(b *testing.B) {
@@ -156,6 +162,10 @@ func BenchmarkLong(b *testing.B) {
 
 func BenchmarkShort(b *testing.B) {
 	testHash(b, New, shortData)
+}
+
+func BenchmarkSHA2LL(b *testing.B) {
+	testHash(b, sha256.New, longerData)
 }
 
 func BenchmarkSHA2L(b *testing.B) {
