@@ -29,7 +29,6 @@ func Test256C(t *testing.T) {
 	h := New()
 	h.Write(data[:1])
 	sum := h.Sum(nil)
-	//fmt.Printf("%X\n", sum)
 	if !bytes.Equal(hashes[0], sum) {
 		t.Errorf("0: expected %X, got %X", hashes[0], sum)
 	}
@@ -37,7 +36,6 @@ func Test256C(t *testing.T) {
 	// Try to continue hashing.
 	h.Write(data[1:])
 	sum = h.Sum(nil)
-	//fmt.Printf("%X\n", sum)
 	if !bytes.Equal(hashes[1], sum) {
 		t.Errorf("1(1): expected %X, got %X", hashes[1], sum)
 	}
@@ -46,7 +44,6 @@ func Test256C(t *testing.T) {
 	h.Reset()
 	h.Write(data)
 	sum = h.Sum(nil)
-	//fmt.Printf("%X\n", sum)
 	if !bytes.Equal(hashes[1], sum) {
 		t.Errorf("1(2): expected %X, got %X", hashes[1], sum)
 	}
