@@ -18,7 +18,7 @@ type digest struct {
 	hashSize int             // hash output size in bits (224 or 256)
 	h        [8]uint32       // current chain value
 	s        [4]uint32       // salt (zero by default)
-	t        uint64          // message length counter in bits
+	t        uint64          // message bits counter
 	nullt    bool            // special case for finalization: skip counter
 	x        [BlockSize]byte // buffer for data not yet compressed
 	nx       int             // number of bytes in buffer
