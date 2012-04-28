@@ -14,6 +14,12 @@ import "hash"
 // The block size of the hash algorithm in bytes.
 const BlockSize = 64
 
+// The size of BLAKE-256 hash in bytes.
+const Size = 32
+
+// The size of BLAKE-224 hash in bytes.
+const Size224 = 28
+
 type digest struct {
 	hashSize int             // hash output size in bits (224 or 256)
 	h        [8]uint32       // current chain value
