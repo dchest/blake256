@@ -162,6 +162,16 @@ func benchHash(b *testing.B, hashfunc func() hash.Hash, data []byte) {
 	}
 }
 
+func benchHashWrite(b *testing.B, hashfunc func() hash.Hash, data []byte) {
+	b.StopTimer()
+	h := hashfunc()
+	b.SetBytes(int64(len(data)))
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		h.Write(data)
+	}
+}
+
 func BenchmarkLonger(b *testing.B) {
 	benchHash(b, New, longerData)
 }
@@ -184,4 +194,29 @@ func BenchmarkSHA2L(b *testing.B) {
 
 func BenchmarkSHA2S(b *testing.B) {
 	benchHash(b, sha256.New, shortData)
+}
+
+
+func BenchmarkWriteLonger(b *testing.B) {
+	benchHashWrite(b, New, longerData)
+}
+
+func BenchmarkWriteLong(b *testing.B) {
+	benchHashWrite(b, New, longData)
+}
+
+func BenchmarkWriteShort(b *testing.B) {
+	benchHashWrite(b, New, shortData)
+}
+
+func BenchmarkWriteSHA2LL(b *testing.B) {
+	benchHashWrite(b, sha256.New, longerData)
+}
+
+func BenchmarkWriteSHA2L(b *testing.B) {
+	benchHashWrite(b, sha256.New, longData)
+}
+
+func BenchmarkWriteSHA2S(b *testing.B) {
+	benchHashWrite(b, sha256.New, shortData)
 }
