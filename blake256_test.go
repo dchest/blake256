@@ -149,39 +149,39 @@ func init() {
 	shortData = make([]byte, 64)
 }
 
-func testHash(b *testing.B, hashfunc func() hash.Hash, data []byte) {
+func benchHash(b *testing.B, hashfunc func() hash.Hash, data []byte) {
 	b.StopTimer()
 	h := hashfunc()
 	digest := make([]byte, 0, BlockSize)
+	b.SetBytes(int64(len(data)))
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		h.Write(data)
 		h.Sum(digest)
 		h.Reset()
-		b.SetBytes(int64(len(data)))
 	}
 }
 
 func BenchmarkLonger(b *testing.B) {
-	testHash(b, New, longerData)
+	benchHash(b, New, longerData)
 }
 
 func BenchmarkLong(b *testing.B) {
-	testHash(b, New, longData)
+	benchHash(b, New, longData)
 }
 
 func BenchmarkShort(b *testing.B) {
-	testHash(b, New, shortData)
+	benchHash(b, New, shortData)
 }
 
 func BenchmarkSHA2LL(b *testing.B) {
-	testHash(b, sha256.New, longerData)
+	benchHash(b, sha256.New, longerData)
 }
 
 func BenchmarkSHA2L(b *testing.B) {
-	testHash(b, sha256.New, longData)
+	benchHash(b, sha256.New, longData)
 }
 
 func BenchmarkSHA2S(b *testing.B) {
-	testHash(b, sha256.New, shortData)
+	benchHash(b, sha256.New, shortData)
 }
