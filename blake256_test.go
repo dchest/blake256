@@ -196,7 +196,6 @@ func BenchmarkSHA2S(b *testing.B) {
 	benchHash(b, sha256.New, shortData)
 }
 
-
 func BenchmarkWriteLonger(b *testing.B) {
 	benchHashWrite(b, New, longerData)
 }
