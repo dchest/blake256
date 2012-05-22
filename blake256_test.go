@@ -9,7 +9,6 @@ package blake256
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"fmt"
 	"hash"
 	"testing"
@@ -141,81 +140,38 @@ func TestSalt(t *testing.T) {
 	NewSalt([]byte{1, 2, 3, 4, 5, 6, 7, 8})
 }
 
-var longerData, longData, shortData []byte
+var bench = New()
+var buf = makeBuf()
 
-func init() {
-	longerData = make([]byte, 88888)
-	longData = make([]byte, 4096)
-	shortData = make([]byte, 64)
+func makeBuf() []byte {
+        b := make([]byte, 8<<10)
+        for i := range b {
+                b[i] = byte(i)
+        }
+        return b
 }
 
-func benchHash(b *testing.B, hashfunc func() hash.Hash, data []byte) {
-	b.StopTimer()
-	h := hashfunc()
-	digest := make([]byte, 0, BlockSize)
-	b.SetBytes(int64(len(data)))
-	b.StartTimer()
+func BenchmarkHash1K(b *testing.B) {
+        b.SetBytes(1024)
+        for i := 0; i < b.N; i++ {
+                bench.Write(buf[:1024])
+        }
+}
+
+func BenchmarkHash8K(b *testing.B) {
+        b.SetBytes(int64(len(buf)))
+        for i := 0; i < b.N; i++ {
+                bench.Write(buf)
+        }
+}
+
+func BenchmarkFull64(b *testing.B) {
+	b.SetBytes(64)
+	tmp := make([]byte, 32)
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		h.Write(data)
-		h.Sum(digest)
-		h.Reset()
+		bench.Reset()
+		bench.Write(buf[:64])
+		bench.Sum(tmp[0:0])
 	}
-}
-
-func benchHashWrite(b *testing.B, hashfunc func() hash.Hash, data []byte) {
-	b.StopTimer()
-	h := hashfunc()
-	b.SetBytes(int64(len(data)))
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		h.Write(data)
-	}
-}
-
-func BenchmarkLonger(b *testing.B) {
-	benchHash(b, New, longerData)
-}
-
-func BenchmarkLong(b *testing.B) {
-	benchHash(b, New, longData)
-}
-
-func BenchmarkShort(b *testing.B) {
-	benchHash(b, New, shortData)
-}
-
-func BenchmarkSHA2LL(b *testing.B) {
-	benchHash(b, sha256.New, longerData)
-}
-
-func BenchmarkSHA2L(b *testing.B) {
-	benchHash(b, sha256.New, longData)
-}
-
-func BenchmarkSHA2S(b *testing.B) {
-	benchHash(b, sha256.New, shortData)
-}
-
-func BenchmarkWriteLonger(b *testing.B) {
-	benchHashWrite(b, New, longerData)
-}
-
-func BenchmarkWriteLong(b *testing.B) {
-	benchHashWrite(b, New, longData)
-}
-
-func BenchmarkWriteShort(b *testing.B) {
-	benchHashWrite(b, New, shortData)
-}
-
-func BenchmarkWriteSHA2LL(b *testing.B) {
-	benchHashWrite(b, sha256.New, longerData)
-}
-
-func BenchmarkWriteSHA2L(b *testing.B) {
-	benchHashWrite(b, sha256.New, longData)
-}
-
-func BenchmarkWriteSHA2S(b *testing.B) {
-	benchHashWrite(b, sha256.New, shortData)
 }
