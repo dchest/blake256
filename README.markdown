@@ -17,6 +17,16 @@ const BlockSize = 64
 ```
 The block size of the hash algorithm in bytes.
 
+``` go
+const Size = 32
+```
+The size of BLAKE-256 hash in bytes.
+
+``` go
+const Size224 = 28
+```
+The size of BLAKE-224 hash in bytes.
+
 
 Functions
 ---------
