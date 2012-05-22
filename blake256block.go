@@ -33,13 +33,14 @@ const (
 func _Block(d *digest, p []uint8) int {
 	n := 0
 	h0, h1, h2, h3, h4, h5, h6, h7 := d.h[0], d.h[1], d.h[2], d.h[3], d.h[4], d.h[5], d.h[6], d.h[7]
+	s0, s1, s2, s3 := d.s[0], d.s[1], d.s[2], d.s[3]
 
 	for len(p) >= BlockSize {
 		v0, v1, v2, v3, v4, v5, v6, v7 := h0, h1, h2, h3, h4, h5, h6, h7
-		v8 := cst0 ^ d.s[0]
-		v9 := cst1 ^ d.s[1]
-		v10 := cst2 ^ d.s[2]
-		v11 := cst3 ^ d.s[3]
+		v8 := cst0 ^ s0
+		v9 := cst1 ^ s1
+		v10 := cst2 ^ s2
+		v11 := cst3 ^ s3
 		v12 := uint32(cst4)
 		v13 := uint32(cst5)
 		v14 := uint32(cst6)
@@ -1675,14 +1676,14 @@ func _Block(d *digest, p []uint8) int {
 		v6 ^= v14
 		v7 ^= v15
 
-		v0 ^= d.s[0]
-		v1 ^= d.s[1]
-		v2 ^= d.s[2]
-		v3 ^= d.s[3]
-		v4 ^= d.s[0]
-		v5 ^= d.s[1]
-		v6 ^= d.s[2]
-		v7 ^= d.s[3]
+		v0 ^= s0
+		v1 ^= s1
+		v2 ^= s2
+		v3 ^= s3
+		v4 ^= s0
+		v5 ^= s1
+		v6 ^= s2
+		v7 ^= s3
 
 		h0 ^= v0
 		h1 ^= v1
