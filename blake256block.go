@@ -12,22 +12,22 @@
 package blake256
 
 const (
-	cst0  uint32 = 0x243F6A88
-	cst1  uint32 = 0x85A308D3
-	cst2  uint32 = 0x13198A2E
-	cst3  uint32 = 0x03707344
-	cst4  uint32 = 0xA4093822
-	cst5  uint32 = 0x299F31D0
-	cst6  uint32 = 0x082EFA98
-	cst7  uint32 = 0xEC4E6C89
-	cst8  uint32 = 0x452821E6
-	cst9  uint32 = 0x38D01377
-	cst10 uint32 = 0xBE5466CF
-	cst11 uint32 = 0x34E90C6C
-	cst12 uint32 = 0xC0AC29B7
-	cst13 uint32 = 0xC97C50DD
-	cst14 uint32 = 0x3F84D5B5
-	cst15 uint32 = 0xB5470917
+	cst0  = 0x243F6A88
+	cst1  = 0x85A308D3
+	cst2  = 0x13198A2E
+	cst3  = 0x03707344
+	cst4  = 0xA4093822
+	cst5  = 0x299F31D0
+	cst6  = 0x082EFA98
+	cst7  = 0xEC4E6C89
+	cst8  = 0x452821E6
+	cst9  = 0x38D01377
+	cst10 = 0xBE5466CF
+	cst11 = 0x34E90C6C
+	cst12 = 0xC0AC29B7
+	cst13 = 0xC97C50DD
+	cst14 = 0x3F84D5B5
+	cst15 = 0xB5470917
 )
 
 func _Block(d *digest, p []uint8) int {
@@ -40,10 +40,10 @@ func _Block(d *digest, p []uint8) int {
 		v9 := cst1 ^ d.s[1]
 		v10 := cst2 ^ d.s[2]
 		v11 := cst3 ^ d.s[3]
-		v12 := cst4
-		v13 := cst5
-		v14 := cst6
-		v15 := cst7
+		v12 := uint32(cst4)
+		v13 := uint32(cst5)
+		v14 := uint32(cst6)
+		v15 := uint32(cst7)
 		d.t += 512
 		if !d.nullt {
 			v12 ^= uint32(d.t)
