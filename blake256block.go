@@ -1667,32 +1667,14 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		v0 ^= v8
-		v1 ^= v9
-		v2 ^= v10
-		v3 ^= v11
-		v4 ^= v12
-		v5 ^= v13
-		v6 ^= v14
-		v7 ^= v15
-
-		v0 ^= s0
-		v1 ^= s1
-		v2 ^= s2
-		v3 ^= s3
-		v4 ^= s0
-		v5 ^= s1
-		v6 ^= s2
-		v7 ^= s3
-
-		h0 ^= v0
-		h1 ^= v1
-		h2 ^= v2
-		h3 ^= v3
-		h4 ^= v4
-		h5 ^= v5
-		h6 ^= v6
-		h7 ^= v7
+		h0 ^= v0 ^ v8 ^ s0
+		h1 ^= v1 ^ v9 ^ s1
+		h2 ^= v2 ^ v10 ^ s2
+		h3 ^= v3 ^ v11 ^ s3
+		h4 ^= v4 ^ v12 ^ s0
+		h5 ^= v5 ^ v13 ^ s1
+		h6 ^= v6 ^ v14 ^ s2
+		h7 ^= v7 ^ v15 ^ s3
 
 		p = p[BlockSize:]
 		n += BlockSize
