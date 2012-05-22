@@ -69,7 +69,7 @@ func _Block(d *digest, p []uint8) int {
 		m14 := uint32(p[56])<<24 | uint32(p[57])<<16 | uint32(p[58])<<8 | uint32(p[59])
 		m15 := uint32(p[60])<<24 | uint32(p[61])<<16 | uint32(p[62])<<8 | uint32(p[63])
 
-		// Round 1
+		// Round 1.
 		v0 += m0 ^ cst1
 		v0 += v4
 		v12 ^= v0
@@ -183,7 +183,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 2
+		// Round 2.
 		v0 += m14 ^ cst10
 		v0 += v4
 		v12 ^= v0
@@ -297,7 +297,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 3
+		// Round 3.
 		v0 += m11 ^ cst8
 		v0 += v4
 		v12 ^= v0
@@ -411,7 +411,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 4
+		// Round 4.
 		v0 += m7 ^ cst9
 		v0 += v4
 		v12 ^= v0
@@ -525,7 +525,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 5
+		// Round 5.
 		v0 += m9 ^ cst0
 		v0 += v4
 		v12 ^= v0
@@ -639,7 +639,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 6
+		// Round 6.
 		v0 += m2 ^ cst12
 		v0 += v4
 		v12 ^= v0
@@ -753,7 +753,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 7
+		// Round 7.
 		v0 += m12 ^ cst5
 		v0 += v4
 		v12 ^= v0
@@ -867,7 +867,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 8
+		// Round 8.
 		v0 += m13 ^ cst11
 		v0 += v4
 		v12 ^= v0
@@ -981,7 +981,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 9
+		// Round 9.
 		v0 += m6 ^ cst15
 		v0 += v4
 		v12 ^= v0
@@ -1095,7 +1095,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 10
+		// Round 10.
 		v0 += m10 ^ cst2
 		v0 += v4
 		v12 ^= v0
@@ -1209,7 +1209,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 11
+		// Round 11.
 		v0 += m0 ^ cst1
 		v0 += v4
 		v12 ^= v0
@@ -1323,7 +1323,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 12
+		// Round 12.
 		v0 += m14 ^ cst10
 		v0 += v4
 		v12 ^= v0
@@ -1437,7 +1437,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 13
+		// Round 13.
 		v0 += m11 ^ cst8
 		v0 += v4
 		v12 ^= v0
@@ -1551,7 +1551,7 @@ func _Block(d *digest, p []uint8) int {
 		v5 ^= v10
 		v5 = v5<<(32-7) | v5>>7
 
-		// Round 14
+		// Round 14.
 		v0 += m7 ^ cst9
 		v0 += v4
 		v12 ^= v0
