@@ -66,13 +66,16 @@ func (d *digest) Write(p []byte) (nn int, err error) {
 		}
 		d.nx += copy(d.x[d.nx:], p)
 		if d.nx == BlockSize {
-			_Block(d, d.x[:])
+			block(d, d.x[:])
 			d.nx = 0
 		}
 		p = p[n:]
 	}
-	n := _Block(d, p)
-	p = p[n:]
+	if len(p) >= BlockSize {
+		n := len(p) &^ (BlockSize - 1)
+		block(d, p[:n])
+		p = p[n:]
+	}
 	if len(p) > 0 {
 		d.nx = copy(d.x[:], p)
 	}
