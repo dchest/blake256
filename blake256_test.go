@@ -141,15 +141,7 @@ func TestSalt(t *testing.T) {
 }
 
 var bench = New()
-var buf = makeBuf()
-
-func makeBuf() []byte {
-	b := make([]byte, 8<<10)
-	for i := range b {
-		b[i] = byte(i)
-	}
-	return b
-}
+var buf = make([]byte, 8<<10)
 
 func BenchmarkHash1K(b *testing.B) {
 	b.SetBytes(1024)
