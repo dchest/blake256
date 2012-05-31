@@ -39,6 +39,8 @@ var (
 	iv224 = [8]uint32{
 		0xC1059ED8, 0x367CD507, 0x3070DD17, 0xF70E5939,
 		0xFFC00B31, 0x68581511, 0x64F98FA7, 0xBEFA4FA4}
+
+	pad = [64]byte{0x80}
 )
 
 // Reset resets the state of digest. It leaves salt intact.
@@ -108,7 +110,6 @@ func (d0 *digest) Sum(in []byte) []byte {
 			d.Write([]byte{0x81})
 		}
 	} else {
-		pad := [64]byte{0x80}
 		if nx < 55 {
 			// Enough space to fill the block.
 			if nx == 0 {
