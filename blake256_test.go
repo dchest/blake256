@@ -159,30 +159,53 @@ func TestTwoWrites(t *testing.T) {
 	}
 }
 
-var bench = New()
-var buf = make([]byte, 8<<10)
+var buf_in = make([]byte, 8<<10)
+var buf_out = make([]byte, 32)
 
-func BenchmarkHash1K(b *testing.B) {
+func Benchmark1K(b *testing.B) {
 	b.SetBytes(1024)
 	for i := 0; i < b.N; i++ {
-		bench.Write(buf[:1024])
+		var bench = New()
+		bench.Write(buf_in[:1024])
+		bench.Sum(buf_out[0:0])
 	}
 }
 
-func BenchmarkHash8K(b *testing.B) {
-	b.SetBytes(int64(len(buf)))
+func Benchmark8K(b *testing.B) {
+	b.SetBytes(int64(len(buf_in)))
 	for i := 0; i < b.N; i++ {
-		bench.Write(buf)
+		var bench = New()
+		bench.Write(buf_in)
+		bench.Sum(buf_out[0:0])
 	}
 }
 
-func BenchmarkFull64(b *testing.B) {
+func Benchmark64(b *testing.B) {
 	b.SetBytes(64)
-	tmp := make([]byte, 32)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		bench.Reset()
-		bench.Write(buf[:64])
-		bench.Sum(tmp[0:0])
+		var bench = New()
+		bench.Write(buf_in[:64])
+		bench.Sum(buf_out[0:0])
+	}
+}
+
+func Benchmark1KNoAlloc(b *testing.B) {
+	b.SetBytes(1024)
+	for i := 0; i < b.N; i++ {
+		Sum256(buf_in[:1024])
+	}
+}
+
+func Benchmark8KNoAlloc(b *testing.B) {
+	b.SetBytes(int64(len(buf_in)))
+	for i := 0; i < b.N; i++ {
+		Sum256(buf_in)
+	}
+}
+
+func Benchmark64NoAlloc(b *testing.B) {
+	b.SetBytes(64)
+	for i := 0; i < b.N; i++ {
+		Sum256(buf_in[:64])
 	}
 }
