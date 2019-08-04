@@ -93,7 +93,7 @@ var vectors224 = []blakeVector{
 		"Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo"},
 }
 
-func testVectors(t *testing.T, hashfunc func() hash.Hash, vectors []blakeVector) {
+func newTestVectors(t *testing.T, hashfunc func() hash.Hash, vectors []blakeVector) {
 	for i, v := range vectors {
 		h := hashfunc()
 		h.Write([]byte(v.in))
@@ -104,12 +104,30 @@ func testVectors(t *testing.T, hashfunc func() hash.Hash, vectors []blakeVector)
 	}
 }
 
-func Test256(t *testing.T) {
-	testVectors(t, New, vectors256)
+func TestNew256(t *testing.T) {
+	newTestVectors(t, New, vectors256)
 }
 
-func Test224(t *testing.T) {
-	testVectors(t, New224, vectors224)
+func TestNew224(t *testing.T) {
+	newTestVectors(t, New224, vectors224)
+}
+
+func TestSum256(t *testing.T) {
+	for i, v := range vectors256 {
+		res := fmt.Sprintf("%x", Sum256([]byte(v.in)))
+		if res != v.out {
+			t.Errorf("%d: expected %q, got %q", i, v.out, res)
+		}
+	}
+}
+
+func TestSum224(t *testing.T) {
+	for i, v := range vectors224 {
+		res := fmt.Sprintf("%x", Sum224([]byte(v.in)))
+		if res != v.out {
+			t.Errorf("%d: expected %q, got %q", i, v.out, res)
+		}
+	}
 }
 
 var vectors256salt = []struct{ out, in, salt string }{
@@ -159,30 +177,53 @@ func TestTwoWrites(t *testing.T) {
 	}
 }
 
-var bench = New()
-var buf = make([]byte, 8<<10)
+var buf_in = make([]byte, 8<<10)
+var buf_out = make([]byte, 32)
 
-func BenchmarkHash1K(b *testing.B) {
+func Benchmark1K(b *testing.B) {
 	b.SetBytes(1024)
 	for i := 0; i < b.N; i++ {
-		bench.Write(buf[:1024])
+		var bench = New()
+		bench.Write(buf_in[:1024])
+		_ = bench.Sum(buf_out[0:0])
 	}
 }
 
-func BenchmarkHash8K(b *testing.B) {
-	b.SetBytes(int64(len(buf)))
+func Benchmark8K(b *testing.B) {
+	b.SetBytes(int64(len(buf_in)))
 	for i := 0; i < b.N; i++ {
-		bench.Write(buf)
+		var bench = New()
+		bench.Write(buf_in)
+		_ = bench.Sum(buf_out[0:0])
 	}
 }
 
-func BenchmarkFull64(b *testing.B) {
+func Benchmark64(b *testing.B) {
 	b.SetBytes(64)
-	tmp := make([]byte, 32)
-	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		bench.Reset()
-		bench.Write(buf[:64])
-		bench.Sum(tmp[0:0])
+		var bench = New()
+		bench.Write(buf_in[:64])
+		_ = bench.Sum(buf_out[0:0])
+	}
+}
+
+func Benchmark1KNoAlloc(b *testing.B) {
+	b.SetBytes(1024)
+	for i := 0; i < b.N; i++ {
+		_ = Sum256(buf_in[:1024])
+	}
+}
+
+func Benchmark8KNoAlloc(b *testing.B) {
+	b.SetBytes(int64(len(buf_in)))
+	for i := 0; i < b.N; i++ {
+		_ = Sum256(buf_in)
+	}
+}
+
+func Benchmark64NoAlloc(b *testing.B) {
+	b.SetBytes(64)
+	for i := 0; i < b.N; i++ {
+		_ = Sum256(buf_in[:64])
 	}
 }

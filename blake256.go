@@ -88,10 +88,17 @@ func (d *digest) Write(p []byte) (nn int, err error) {
 func (d0 *digest) Sum(in []byte) []byte {
 	// Make a copy of d0 so that caller can keep writing and summing.
 	d := *d0
+	sum := d.checkSum()
+	if d.Size() == Size224 {
+		return append(in, sum[:Size224]...)
+	}
+	return append(in, sum[:]...)
+}
 
+func (d *digest) checkSum() [Size]byte {
 	nx := uint64(d.nx)
 	l := d.t + nx<<3
-	len := make([]byte, 8)
+	var len [8]byte
 	len[0] = byte(l >> 56)
 	len[1] = byte(l >> 48)
 	len[2] = byte(l >> 40)
@@ -133,9 +140,9 @@ func (d0 *digest) Sum(in []byte) []byte {
 		d.t -= 8
 	}
 	d.t -= 64
-	d.Write(len)
+	d.Write(len[:])
 
-	out := make([]byte, d.Size())
+	var out [Size]byte
 	j := 0
 	for _, s := range d.h[:d.hashSize>>5] {
 		out[j+0] = byte(s >> 24)
@@ -144,7 +151,7 @@ func (d0 *digest) Sum(in []byte) []byte {
 		out[j+3] = byte(s >> 0)
 		j += 4
 	}
-	return append(in, out...)
+	return out
 }
 
 func (d *digest) setSalt(s []byte) {
@@ -191,4 +198,24 @@ func New224Salt(salt []byte) hash.Hash {
 	}
 	d.setSalt(salt)
 	return d
+}
+
+// Sum256 returns the BLAKE-256 checksum of the data.
+func Sum256(data []byte) [Size]byte {
+	var d digest
+	d.hashSize = 256
+	d.Reset()
+	d.Write(data)
+	return d.checkSum()
+}
+
+// Sum224 returns the BLAKE-224 checksum of the data.
+func Sum224(data []byte) (sum224 [Size224]byte) {
+	var d digest
+	d.hashSize = 224
+	d.Reset()
+	d.Write(data)
+	sum := d.checkSum()
+	copy(sum224[:], sum[:Size224])
+	return
 }
