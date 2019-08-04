@@ -5,15 +5,13 @@
 // worldwide. This software is distributed without any warranty.
 // http://creativecommons.org/publicdomain/zero/1.0/
 
-package blake256_test
+package blake256
 
 import (
 	"bytes"
 	"fmt"
 	"hash"
 	"testing"
-
-	"github.com/teknico/blake256"
 )
 
 func Test256C(t *testing.T) {
@@ -34,7 +32,7 @@ func Test256C(t *testing.T) {
 	}
 	data := make([]byte, 72)
 
-	h := blake256.New()
+	h := New()
 	h.Write(data[:1])
 	sum := h.Sum(nil)
 	if !bytes.Equal(hashes[0], sum) {
@@ -107,16 +105,16 @@ func newTestVectors(t *testing.T, hashfunc func() hash.Hash, vectors []blakeVect
 }
 
 func TestNew256(t *testing.T) {
-	newTestVectors(t, blake256.New, vectors256)
+	newTestVectors(t, New, vectors256)
 }
 
 func TestNew224(t *testing.T) {
-	newTestVectors(t, blake256.New224, vectors224)
+	newTestVectors(t, New224, vectors224)
 }
 
 func TestSum256(t *testing.T) {
 	for i, v := range vectors256 {
-		res := fmt.Sprintf("%x", blake256.Sum256([]byte(v.in)))
+		res := fmt.Sprintf("%x", Sum256([]byte(v.in)))
 		if res != v.out {
 			t.Errorf("%d: expected %q, got %q", i, v.out, res)
 		}
@@ -125,7 +123,7 @@ func TestSum256(t *testing.T) {
 
 func TestSum224(t *testing.T) {
 	for i, v := range vectors224 {
-		res := fmt.Sprintf("%x", blake256.Sum224([]byte(v.in)))
+		res := fmt.Sprintf("%x", Sum224([]byte(v.in)))
 		if res != v.out {
 			t.Errorf("%d: expected %q, got %q", i, v.out, res)
 		}
@@ -143,7 +141,7 @@ var vectors256salt = []struct{ out, in, salt string }{
 
 func TestSalt(t *testing.T) {
 	for i, v := range vectors256salt {
-		h := blake256.NewSalt([]byte(v.salt))
+		h := NewSalt([]byte(v.salt))
 		h.Write([]byte(v.in))
 		res := fmt.Sprintf("%x", h.Sum(nil))
 		if res != v.out {
@@ -157,7 +155,7 @@ func TestSalt(t *testing.T) {
 			t.Errorf("expected panic for bad salt length")
 		}
 	}()
-	blake256.NewSalt([]byte{1, 2, 3, 4, 5, 6, 7, 8})
+	NewSalt([]byte{1, 2, 3, 4, 5, 6, 7, 8})
 }
 
 func TestTwoWrites(t *testing.T) {
@@ -165,12 +163,12 @@ func TestTwoWrites(t *testing.T) {
 	for i := range b {
 		b[i] = byte(i)
 	}
-	h1 := blake256.New()
+	h1 := New()
 	h1.Write(b[:1])
 	h1.Write(b[1:])
 	sum1 := h1.Sum(nil)
 
-	h2 := blake256.New()
+	h2 := New()
 	h2.Write(b)
 	sum2 := h2.Sum(nil)
 
@@ -185,7 +183,7 @@ var buf_out = make([]byte, 32)
 func Benchmark1K(b *testing.B) {
 	b.SetBytes(1024)
 	for i := 0; i < b.N; i++ {
-		var bench = blake256.New()
+		var bench = New()
 		bench.Write(buf_in[:1024])
 		_ = bench.Sum(buf_out[0:0])
 	}
@@ -194,7 +192,7 @@ func Benchmark1K(b *testing.B) {
 func Benchmark8K(b *testing.B) {
 	b.SetBytes(int64(len(buf_in)))
 	for i := 0; i < b.N; i++ {
-		var bench = blake256.New()
+		var bench = New()
 		bench.Write(buf_in)
 		_ = bench.Sum(buf_out[0:0])
 	}
@@ -203,7 +201,7 @@ func Benchmark8K(b *testing.B) {
 func Benchmark64(b *testing.B) {
 	b.SetBytes(64)
 	for i := 0; i < b.N; i++ {
-		var bench = blake256.New()
+		var bench = New()
 		bench.Write(buf_in[:64])
 		_ = bench.Sum(buf_out[0:0])
 	}
@@ -212,20 +210,20 @@ func Benchmark64(b *testing.B) {
 func Benchmark1KNoAlloc(b *testing.B) {
 	b.SetBytes(1024)
 	for i := 0; i < b.N; i++ {
-		_ = blake256.Sum256(buf_in[:1024])
+		_ = Sum256(buf_in[:1024])
 	}
 }
 
 func Benchmark8KNoAlloc(b *testing.B) {
 	b.SetBytes(int64(len(buf_in)))
 	for i := 0; i < b.N; i++ {
-		_ = blake256.Sum256(buf_in)
+		_ = Sum256(buf_in)
 	}
 }
 
 func Benchmark64NoAlloc(b *testing.B) {
 	b.SetBytes(64)
 	for i := 0; i < b.N; i++ {
-		_ = blake256.Sum256(buf_in[:64])
+		_ = Sum256(buf_in[:64])
 	}
 }
