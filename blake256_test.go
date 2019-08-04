@@ -95,7 +95,7 @@ var vectors224 = []blakeVector{
 		"Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo"},
 }
 
-func testVectors(t *testing.T, hashfunc func() hash.Hash, vectors []blakeVector) {
+func newTestVectors(t *testing.T, hashfunc func() hash.Hash, vectors []blakeVector) {
 	for i, v := range vectors {
 		h := hashfunc()
 		h.Write([]byte(v.in))
@@ -106,12 +106,30 @@ func testVectors(t *testing.T, hashfunc func() hash.Hash, vectors []blakeVector)
 	}
 }
 
-func Test256(t *testing.T) {
-	testVectors(t, blake256.New, vectors256)
+func TestNew256(t *testing.T) {
+	newTestVectors(t, blake256.New, vectors256)
 }
 
-func Test224(t *testing.T) {
-	testVectors(t, blake256.New224, vectors224)
+func TestNew224(t *testing.T) {
+	newTestVectors(t, blake256.New224, vectors224)
+}
+
+func TestSum256(t *testing.T) {
+	for i, v := range vectors256 {
+		res := fmt.Sprintf("%x", blake256.Sum256([]byte(v.in)))
+		if res != v.out {
+			t.Errorf("%d: expected %q, got %q", i, v.out, res)
+		}
+	}
+}
+
+func TestSum224(t *testing.T) {
+	for i, v := range vectors224 {
+		res := fmt.Sprintf("%x", blake256.Sum224([]byte(v.in)))
+		if res != v.out {
+			t.Errorf("%d: expected %q, got %q", i, v.out, res)
+		}
+	}
 }
 
 var vectors256salt = []struct{ out, in, salt string }{
@@ -169,7 +187,7 @@ func Benchmark1K(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var bench = blake256.New()
 		bench.Write(buf_in[:1024])
-		bench.Sum(buf_out[0:0])
+		_ = bench.Sum(buf_out[0:0])
 	}
 }
 
@@ -178,7 +196,7 @@ func Benchmark8K(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var bench = blake256.New()
 		bench.Write(buf_in)
-		bench.Sum(buf_out[0:0])
+		_ = bench.Sum(buf_out[0:0])
 	}
 }
 
@@ -187,27 +205,27 @@ func Benchmark64(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var bench = blake256.New()
 		bench.Write(buf_in[:64])
-		bench.Sum(buf_out[0:0])
+		_ = bench.Sum(buf_out[0:0])
 	}
 }
 
 func Benchmark1KNoAlloc(b *testing.B) {
 	b.SetBytes(1024)
 	for i := 0; i < b.N; i++ {
-		blake256.Sum256(buf_in[:1024])
+		_ = blake256.Sum256(buf_in[:1024])
 	}
 }
 
 func Benchmark8KNoAlloc(b *testing.B) {
 	b.SetBytes(int64(len(buf_in)))
 	for i := 0; i < b.N; i++ {
-		blake256.Sum256(buf_in)
+		_ = blake256.Sum256(buf_in)
 	}
 }
 
 func Benchmark64NoAlloc(b *testing.B) {
 	b.SetBytes(64)
 	for i := 0; i < b.N; i++ {
-		blake256.Sum256(buf_in[:64])
+		_ = blake256.Sum256(buf_in[:64])
 	}
 }
