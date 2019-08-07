@@ -54,3 +54,15 @@ New224Salt is like New224 but initializes salt with the given 16-byte slice.
 	func NewSalt(salt []byte) hash.Hash
 
 NewSalt is like New but initializes salt with the given 16-byte slice.
+
+### func Sum256
+
+	func Sum256(data []byte) [Size]byte
+
+Sum returns the BLAKE-256 checksum of the data.
+
+### func Sum224
+
+	func Sum224(data []byte) (sum224 [Size224]byte)
+
+Sum224 returns the BLAKE-224 checksum of the data.
